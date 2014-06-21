@@ -1,21 +1,35 @@
 define('partials/StripView', [
     'famous/core/View',
-    'famous/modifiers/StateModifier',
     'famous/core/Transform',
     'famous/core/Surface',
-    'famous/surfaces/ImageSurface'
+    'famous/core/EventHandler',
+    'famous/surfaces/ImageSurface', // https://github.com/Famous/surfaces
+    'famous/modifiers/StateModifier',
+    'famous/inputs/FastClick',
+    'famous/utilities/Timer'
     ], function(require, exports, module){
         var View            = require('famous/core/View');
         var Surface         = require('famous/core/Surface');
-        var StateModifier   = require('famous/modifiers/StateModifier');
         var Transform       = require('famous/core/Transform');
+        var EventHandler    = require('famous/core/EventHandler');
+        var StateModifier   = require('famous/modifiers/StateModifier');
         var ImageSurface    = require('famous/surfaces/ImageSurface');
+        var FastClick       = require('famous/inputs/FastClick');
+        var Timer           = require('famous/utilities/Timer');
+
+        var eventHandler = new EventHandler();
+        eventHandler.on('hello', function(page) {
+            console.log(page);
+        });
+
         function StripView () {
             View.apply(this, arguments);
 
             _createBackground.call(this);
             _createIcon.call(this);
             _createTitle.call(this);
+
+            _setListeners.call(this);
         }
         StripView.prototype = Object.create(View.prototype);
         StripView.prototype.constructor = StripView;
@@ -31,11 +45,10 @@ define('partials/StripView', [
 
         //add view
         function _createBackground() {
-            var backgroundSurface = new Surface({
+            this.backgroundSurface = new Surface({
                 size: [this.options.width, this.options.height],
-                properties: {
-                    backgroundColor: 'black'
-                }
+                properties: {},
+                classes: ['grey-bg']
             });
             var rotateModifier = new StateModifier({
                 transform: Transform.rotateZ(this.options.angle)
@@ -45,10 +58,11 @@ define('partials/StripView', [
             });
 
             // we're first skewing our surface then rotating it
-            this.add(rotateModifier).add(skewModifier).add(backgroundSurface);
+            this.add(rotateModifier).add(skewModifier).add(this.backgroundSurface);
         }
         function _createIcon() {
-            var iconSurface = new ImageSurface({
+            var self = this;
+            self.iconSurface = new ImageSurface({
                 size: [this.options.iconSize, this.options.iconSize],
                 content : this.options.iconUrl,
                 properties: {
@@ -56,15 +70,16 @@ define('partials/StripView', [
                 }
             });
 
-            var iconModifier = new StateModifier({
+            this.iconModifier = new StateModifier({
                 // places the icon in the proper location
                 transform: Transform.translate(24, 2, 0)
             });
 
-            this.add(iconModifier).add(iconSurface);
+            this.add(this.iconModifier).add(self.iconSurface);
         }
         function _createTitle() {
-            var titleSurface = new Surface({
+            var self = this;
+            self.titleSurface = new Surface({
                 size: [true, true],
                 content: this.options.title,
                 properties: {
@@ -79,7 +94,35 @@ define('partials/StripView', [
                 transform: Transform.thenMove(Transform.rotateZ(this.options.angle), [75, -5, 0])
             });
 
-            this.add(titleModifier).add(titleSurface);
+            this.add(titleModifier).add(self.titleSurface);
+        }
+
+        function _setListeners() {
+            var self = this;
+
+            self.backgroundSurface.on('click', function() {
+                eventHandler.emit('hello', 'page');
+            }.bind(self));
+
+            self.backgroundSurface.on('mouseover', function() {
+                console.log('mouseover');
+                self.backgroundSurface.setClasses(['red-bg']);
+                Timer.setTimeout(function() {
+                    this.iconModifier.setTransform(
+                                          // x, y, 
+                        Transform.translate( 0, 0, 100), {
+                        duration: 400,
+                        curve: 'easeOut'
+                    });
+                }.bind(this), 100);
+
+            }.bind(self));
+
+            self.backgroundSurface.on('mouseout', function() {
+                console.log('mouseout');
+                self.backgroundSurface.removeClass('red-bg');
+                self.backgroundSurface.setClasses(['grey-bg']);
+            }.bind(self));
         }
 
         module.exports = StripView;
@@ -91,7 +134,8 @@ define('partials/MenuView', [
     'famous/modifiers/StateModifier',
     'famous/core/Transform',
     'famous/utilities/Timer',
-    'partials/StripView'
+    'partials/StripView',
+    'partials/Each'
     ], function(require, exports, module){
         var View            = require('famous/core/View');
         var Surface         = require('famous/core/Surface');
@@ -99,6 +143,7 @@ define('partials/MenuView', [
         var StripView       = require('partials/StripView');
         var Transform       = require('famous/core/Transform');
         var Timer           = require('famous/utilities/Timer');
+        var Each            = require('partials/Each');
 
         function MenuView() {
             View.apply(this, arguments);
@@ -168,6 +213,16 @@ define('partials/MenuView', [
 
                 yOffset += this.options.stripOffset;
             }
+            var s = new Each({
+                data: Projects.find({}, {sort: {name: -1}}),
+                node: function(data){
+                    return new StripView({
+                        iconUrl: '',
+                        title: data.name
+                    });
+                }
+            });
+            this.add(new StateModifier()).add(s);
         }
 
         module.exports = MenuView;

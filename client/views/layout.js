@@ -34,6 +34,7 @@ define('AppView', [
 
         _createPageView.call(this);
         _createMenuView.call(this);
+        //_createBackdrop.call(this);
 
         _setListeners.call(this);
         _handleSwipe.call(this);
@@ -50,7 +51,7 @@ define('AppView', [
         velThreshold: 0.75
     };
 
-    AppView.prototype.toggleMenu = function() {
+    AppView.prototype.menuToggleLeft = function() {
         if(this.menuToggle) {
             this.slideLeft();
         } else {
@@ -64,7 +65,7 @@ define('AppView', [
             this.menuToggle = false;
         }.bind(this));
     };
-     AppView.prototype.slideRight = function() {
+    AppView.prototype.slideRight = function() {
         this.pageViewPos.set(this.options.openPosition, this.options.transition, function() {
             this.menuToggle = true;
         }.bind(this));
@@ -79,6 +80,18 @@ define('AppView', [
             }.bind(this)
         });
         this.add(this.pageModifier).add(this.pageView);
+    }
+
+    function _createBackdrop(){
+        this.backdrop = new Surface({
+            content: '<div class="backdrop visible active"></div>'
+        });
+        this.backdropModifier = new StateModifier({
+            origin: [0, 0.5],
+            align : [0, 0.5],
+            transform: Transform.inFront
+        });
+        this.add(this.backdropModifier).add(this.backdrop);
     }
 
     function _createMenuView(){
@@ -96,7 +109,7 @@ define('AppView', [
     }
 
     function _setListeners() {
-        this.pageView.on('menuToggle', this.toggleMenu.bind(this));
+        this.pageView.on('menuToggleLeft', this.menuToggleLeft.bind(this));
     }
     function _handleSwipe() {
         var sync = new GenericSync(
@@ -138,6 +151,7 @@ define('AppView', [
 
 // start app
 Meteor.startup(function(){
+
     define([
         'famous/core/Engine',
         'AppView'
@@ -148,4 +162,5 @@ Meteor.startup(function(){
         var appView = new AppView();
         mainContext.add(appView);
     });
+
 });

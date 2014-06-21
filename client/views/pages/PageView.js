@@ -8,7 +8,9 @@ define('pages/PageView', [
         'famous/views/HeaderFooterLayout',
         'famous/surfaces/ImageSurface',
         'famous/views/Scrollview',
-        'famous/inputs/FastClick'
+        'famous/inputs/FastClick',
+        'partials/Surface2',
+        'partials/Popup'
     ], function(require, exports, module){
         var View                = require('famous/core/View');
         var Surface             = require('famous/core/Surface');
@@ -19,10 +21,13 @@ define('pages/PageView', [
         var Group               = require('famous/core/Group');
         var Scrollview          = require('famous/views/Scrollview');
         var FastClick           = require('famous/inputs/FastClick');
+        var Surface2            = require('partials/Surface2');
+        var Popup               = require('partials/Popup');
 
         function PageView(){
             View.apply(this, arguments);
 
+            _createBacking.call(this);
             _createLayout.call(this);
             _createHeader.call(this);
             _createBody.call(this);
@@ -60,15 +65,23 @@ define('pages/PageView', [
 
             this.hamburgerSurface = new Surface({
                 size: [44, 44],
-                content: '<button class="button button-icon icon ion-navicon"></button>'
+                content: '<button class="button button-icon icon ion-navicon disable-user-behavior"></button>'
             });
 
-            var searchSurface = new Surface({
+            var searchSurface = new Surface2({
                 size: [232, 44],
-                content: '<h1 class="title"> Title </h1> '
+                content: function(){ 
+                    //return '<h1 class="title"> ' + Session.get('title') + ' </h1> ';
+
+                    //Projects.update("test", {$set: {name: Random.id()}})
+                    var project = Projects.findOne("test");
+                    if(project)
+                        return '<h1 class="title"> ' + project.name + ' </h1> ';
+                    return '<h1 class="title"> ' + 'No name' + ' </h1> ';
+                }
             });
 
-            var iconSurface = new Surface({
+            this.iconSurface = new Surface({
                 size: [44, 44],
                 content: '<button class="button button-icon disable-user-behavior">' +
                             '<i class="icon ion-compose"></i>' +
@@ -92,17 +105,12 @@ define('pages/PageView', [
 
             var headerIonic = new Group({
                 size: [true, 44],
-                classes: ['bar', 'bar-header', 'bar-dark']
+                classes: ['bar', 'bar-header', 'bar-dark', 'disable-user-behavior']
             });
             this.layout.header.add(backgroundModifier).add(headerIonic);
             headerIonic.add(hamburgerModifier).add(this.hamburgerSurface);
             headerIonic.add(searchModifier).add(searchSurface);
-            headerIonic.add(iconModifier).add(iconSurface);
-
-            //this.layout.header.add(backgroundModifier).add(backgroundSurface);
-            //this.layout.header.add(hamburgerModifier).add(this.hamburgerSurface);
-            //this.layout.header.add(searchModifier).add(searchSurface);
-            //this.layout.header.add(iconModifier).add(iconSurface);
+            headerIonic.add(iconModifier).add(this.iconSurface);
         }
         function _createBody() {
             this.bodySurface = new Scrollview();
@@ -127,11 +135,54 @@ define('pages/PageView', [
 
             this.layout.content.add(this.bodySurface);
         }
+        function _createBacking() {
+            var backing = new Surface({
+                properties: {
+                    backgroundColor: 'black',
+                    boxShadow: '0 0 20px rgba(0,0,0,0.5)'
+                }
+            });
+
+            this.add(backing);
+        }
+        function _showPopup() {
+            var self = this;
+            if(!self._popup){
+                self._popup = new Popup({
+                    visible: false
+                });
+                self._popupModifier = new StateModifier({
+                    origin: [0, 0.5],
+                    align : [0, 0.5],
+                    transform: Transform.inFront
+                });
+                self.add(self._popupModifier).add(self._popup);
+            }
+        }
+
         function _setListeners() {
-            this.hamburgerSurface.on('click', function() {
-                this._eventOutput.emit('menuToggle');
-            }.bind(this));
-            this.bodySurface._eventInput.pipe(this._eventOutput);
+            var self = this;
+            self.hamburgerSurface.on('click', function() {
+                self._eventOutput.emit('menuToggleLeft');
+            }.bind(self));
+
+            self.iconSurface.on('click', function() {
+                _showPopup.call(this);
+            }.bind(self));
+
+            self.bodySurface._eventInput.pipe(self._eventOutput);
         }
         module.exports = PageView;
 });
+
+
+/**
+ * Bai toan
+ * 
+ * dung Session de render, session thay doi, render thay doi theo.
+ */
+Session.setDefault('title', 'SEX');
+Meteor.setTimeout(function(){
+    Session.set('title', 'Default');
+    console.log(Session.get('title'));
+}, 3000);
