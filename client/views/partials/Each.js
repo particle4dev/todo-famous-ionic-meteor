@@ -1,14 +1,24 @@
+if(Meteor.isClient)
 define('partials/Each', [
     "famous/core/Surface",
     "famous/core/Modifier",
     "famous/core/Transform",
     "famous/core/View",
     "famous/surfaces/ContainerSurface",
-    'partials/Surface2',
-    'famous/modifiers/StateModifier'
+    'famous/modifiers/StateModifier',
+    'partials/Surface2'    
     ], function (require, exports, module) {
     //https://github.com/meteor/meteor/blob/devel/packages/ui/each.js
     //https://github.com/gadicc/meteor-famous-components/blob/master/lib/famousEach.js
+
+    var Surface         = require("famous/core/Surface");
+    var Modifier        = require("famous/core/Modifier");
+    var Transform       = require('famous/core/Transform');
+    var View            = require("famous/core/View");
+    var ContainerSurface= require("famous/surfaces/ContainerSurface");
+    var StateModifier   = require('famous/modifiers/StateModifier');
+    var Surface2        = require("partials/Surface2");
+
     function Each(options) {
         var self = this;
         View.apply(self, arguments);
@@ -30,12 +40,6 @@ define('partials/Each', [
             }
         });
     }
-    var View            = require("famous/core/View");
-    var Modifier        = require("famous/core/Modifier");
-    var Surface         = require("famous/core/Surface");
-    var Surface2        = require("partials/Surface2");
-    var StateModifier   = require('famous/modifiers/StateModifier');
-    var Transform       = require('famous/core/Transform');
 
     Each.prototype = Object.create(View.prototype);
     Each.prototype.constructor = Each;

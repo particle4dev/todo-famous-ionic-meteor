@@ -140,9 +140,9 @@ define('partials/MenuView', [
         var View            = require('famous/core/View');
         var Surface         = require('famous/core/Surface');
         var StateModifier   = require('famous/modifiers/StateModifier');
-        var StripView       = require('partials/StripView');
         var Transform       = require('famous/core/Transform');
         var Timer           = require('famous/utilities/Timer');
+        var StripView       = require('partials/StripView');
         var Each            = require('partials/Each');
 
         function MenuView() {

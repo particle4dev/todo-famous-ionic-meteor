@@ -9,8 +9,11 @@ define('pages/PageView', [
         'famous/surfaces/ImageSurface',
         'famous/views/Scrollview',
         'famous/inputs/FastClick',
+        'famous/views/RenderController',
+
         'partials/Surface2',
-        'partials/Popup'
+        'partials/Popup',
+        'pages/ProfilePage'
     ], function(require, exports, module){
         var View                = require('famous/core/View');
         var Surface             = require('famous/core/Surface');
@@ -21,8 +24,11 @@ define('pages/PageView', [
         var Group               = require('famous/core/Group');
         var Scrollview          = require('famous/views/Scrollview');
         var FastClick           = require('famous/inputs/FastClick');
+        var RenderController    = require('famous/views/RenderController');
+
         var Surface2            = require('partials/Surface2');
         var Popup               = require('partials/Popup');
+        var ProfilePage         = require('pages/ProfilePage');
 
         function PageView(){
             View.apply(this, arguments);
@@ -30,6 +36,7 @@ define('pages/PageView', [
             _createBacking.call(this);
             _createLayout.call(this);
             _createHeader.call(this);
+            _loadPages.call(this);
             _createBody.call(this);
 
             _setListeners.call(this);
@@ -112,7 +119,12 @@ define('pages/PageView', [
             headerIonic.add(searchModifier).add(searchSurface);
             headerIonic.add(iconModifier).add(this.iconSurface);
         }
+        function _loadPages() {
+            this._pages = [];
+            this._pages['ProfilePage'] = new ProfilePage();
+        }
         function _createBody() {
+            /**
             this.bodySurface = new Scrollview();
             var surfaces = [];
 
@@ -134,6 +146,10 @@ define('pages/PageView', [
             }
 
             this.layout.content.add(this.bodySurface);
+            */
+            this.bodySurface = new RenderController();
+            this.layout.content.add(this.bodySurface);
+            this.bodySurface.show(this._pages['ProfilePage']);
         }
         function _createBacking() {
             var backing = new Surface({
@@ -159,7 +175,6 @@ define('pages/PageView', [
                 self.add(self._popupModifier).add(self._popup);
             }
         }
-
         function _setListeners() {
             var self = this;
             self.hamburgerSurface.on('click', function() {
@@ -180,9 +195,10 @@ define('pages/PageView', [
  * Bai toan
  * 
  * dung Session de render, session thay doi, render thay doi theo.
- */
+
 Session.setDefault('title', 'SEX');
 Meteor.setTimeout(function(){
     Session.set('title', 'Default');
     console.log(Session.get('title'));
 }, 3000);
+ */

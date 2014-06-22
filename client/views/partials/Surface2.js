@@ -1,4 +1,5 @@
 /*** Surface2.js ***/
+if(Meteor.isClient)
 define('partials/Surface2', [
         'famous/core/Surface',
     ], function(require, exports, module){
@@ -42,6 +43,5 @@ define('partials/Surface2', [
                 this._contentDirty = true;
             }
         };
-
         module.exports = Surface2;
 });

@@ -8,20 +8,22 @@ define('AppView', [
     'famous/inputs/MouseSync',
     'famous/inputs/TouchSync',
     'famous/transitions/Transitionable',
-    'pages/PageView',
-    'partials/MenuView'
+    
+    'partials/MenuView',
+    'pages/PageView'
 ], function(require, exports, module){
     var View            = require('famous/core/View');
     var Surface         = require('famous/core/Surface');
     var Transform       = require('famous/core/Transform');
     var StateModifier   = require('famous/modifiers/StateModifier');
-    var PageView        = require('pages/PageView');
-    var MenuView        = require('partials/MenuView');
     var GenericSync     = require('famous/inputs/GenericSync');
     var MouseSync       = require('famous/inputs/MouseSync');
     var TouchSync       = require('famous/inputs/TouchSync');
     var Transitionable  = require('famous/transitions/Transitionable');
     var Modifier        = require('famous/core/Modifier');
+
+    var MenuView        = require('partials/MenuView');
+    var PageView        = require('pages/PageView');
 
     GenericSync.register({'mouse': MouseSync, 'touch': TouchSync});
 
@@ -34,7 +36,7 @@ define('AppView', [
 
         _createPageView.call(this);
         _createMenuView.call(this);
-        //_createBackdrop.call(this);
+        _createBackdrop.call(this);
 
         _setListeners.call(this);
         _handleSwipe.call(this);
@@ -150,8 +152,8 @@ define('AppView', [
 });
 
 // start app
+/***/
 Meteor.startup(function(){
-
     define([
         'famous/core/Engine',
         'AppView'
@@ -162,5 +164,4 @@ Meteor.startup(function(){
         var appView = new AppView();
         mainContext.add(appView);
     });
-
 });

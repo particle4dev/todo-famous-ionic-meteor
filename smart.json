@@ -3,7 +3,9 @@
     "iron-router": {},
     "roles": {},
     "nprogress": {},
-    "famono": {},
+    "famono": {
+      "git": "https://github.com/particle4dev/Meteor-famono.git"
+    },
     "sass": {}
   }
 }

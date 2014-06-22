@@ -1,3 +1,4 @@
+if(Meteor.isClient)
 define('partials/Popup', [
     'famous/core/Surface',
     'famous/core/RenderNode',

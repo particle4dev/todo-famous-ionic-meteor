@@ -5,7 +5,10 @@
       "iron-router": {},
       "roles": {},
       "nprogress": {},
-      "famono": {},
+      "famono": {
+        "git": "https://github.com/particle4dev/Meteor-famono.git",
+        "branch": "master"
+      },
       "sass": {}
     },
     "packages": {
@@ -25,9 +28,9 @@
         "commit": "8333206b751a24fac1fbd1b03fa37621bcefe50c"
       },
       "famono": {
-        "git": "https://github.com/raix/Meteor-famono.git",
-        "tag": "v0.3.3",
-        "commit": "e953d5f1f7a9906d3df86472b9582f14cc3e4699"
+        "git": "https://github.com/particle4dev/Meteor-famono.git",
+        "branch": "master",
+        "commit": "20fe370657b258bf39feb2071fda4c703713e7da"
       },
       "sass": {
         "git": "https://github.com/particle4dev/meteor-sass.git",
