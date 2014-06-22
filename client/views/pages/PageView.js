@@ -13,7 +13,8 @@ define('pages/PageView', [
 
         'partials/Surface2',
         'partials/Popup',
-        'pages/ProfilePage'
+        'pages/ProfilePage',
+        'pages/HomePage'
     ], function(require, exports, module){
         var View                = require('famous/core/View');
         var Surface             = require('famous/core/Surface');
@@ -29,6 +30,7 @@ define('pages/PageView', [
         var Surface2            = require('partials/Surface2');
         var Popup               = require('partials/Popup');
         var ProfilePage         = require('pages/ProfilePage');
+        var HomePage            = require('pages/HomePage');
 
         function PageView(){
             View.apply(this, arguments);
@@ -122,6 +124,7 @@ define('pages/PageView', [
         function _loadPages() {
             this._pages = [];
             this._pages['ProfilePage'] = new ProfilePage();
+            this._pages['HomePage'] = new HomePage();
         }
         function _createBody() {
             /**
@@ -149,7 +152,7 @@ define('pages/PageView', [
             */
             this.bodySurface = new RenderController();
             this.layout.content.add(this.bodySurface);
-            this.bodySurface.show(this._pages['ProfilePage']);
+            _showPage.call(this, 'ProfilePage');
         }
         function _createBacking() {
             var backing = new Surface({
@@ -175,6 +178,12 @@ define('pages/PageView', [
                 self.add(self._popupModifier).add(self._popup);
             }
         }
+
+        function _showPage(name){
+            this.bodySurface.show(this._pages[name]);
+        }
+        PageView.prototype._showPage = _showPage;
+
         function _setListeners() {
             var self = this;
             self.hamburgerSurface.on('click', function() {
@@ -185,7 +194,7 @@ define('pages/PageView', [
                 _showPopup.call(this);
             }.bind(self));
 
-            self.bodySurface._eventInput.pipe(self._eventOutput);
+            //this.bodySurface._eventInput.pipe(self._eventOutput);
         }
         module.exports = PageView;
 });

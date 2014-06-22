@@ -17,11 +17,6 @@ define('partials/StripView', [
         var FastClick       = require('famous/inputs/FastClick');
         var Timer           = require('famous/utilities/Timer');
 
-        var eventHandler = new EventHandler();
-        eventHandler.on('hello', function(page) {
-            console.log(page);
-        });
-
         function StripView () {
             View.apply(this, arguments);
 
@@ -101,12 +96,13 @@ define('partials/StripView', [
             var self = this;
 
             self.backgroundSurface.on('click', function() {
-                eventHandler.emit('hello', 'page');
+                self._eventOutput.emit('switchPage', self.options.page);
+                console.log(self);
             }.bind(self));
 
             self.backgroundSurface.on('mouseover', function() {
-                console.log('mouseover');
                 self.backgroundSurface.setClasses(['red-bg']);
+                /**
                 Timer.setTimeout(function() {
                     this.iconModifier.setTransform(
                                           // x, y, 
@@ -115,11 +111,10 @@ define('partials/StripView', [
                         curve: 'easeOut'
                     });
                 }.bind(this), 100);
-
+                */
             }.bind(self));
 
             self.backgroundSurface.on('mouseout', function() {
-                console.log('mouseout');
                 self.backgroundSurface.removeClass('red-bg');
                 self.backgroundSurface.setClasses(['grey-bg']);
             }.bind(self));
@@ -149,7 +144,6 @@ define('partials/MenuView', [
             View.apply(this, arguments);
 
             _createStripViews.call(this);
-
         }
         MenuView.prototype = Object.create(View.prototype);
         MenuView.prototype.constructor = MenuView;
@@ -201,7 +195,8 @@ define('partials/MenuView', [
             for (var i = 0; i < this.options.stripData.length; i++) {
                 var stripView = new StripView({
                     iconUrl: this.options.stripData[i].iconUrl,
-                    title: this.options.stripData[i].title
+                    title: this.options.stripData[i].title,
+                    page: this.options.stripData[i].page
                 });
 
                 var stripModifier = new StateModifier({
@@ -212,6 +207,9 @@ define('partials/MenuView', [
                 this.add(stripModifier).add(stripView);
 
                 yOffset += this.options.stripOffset;
+                stripView.on('switchPage', function(page){
+                    this._eventOutput.emit('switchPage', page);
+                }.bind(this));
             }
             var s = new Each({
                 data: Projects.find({}, {sort: {name: -1}}),

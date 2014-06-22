@@ -36,7 +36,7 @@ define('AppView', [
 
         _createPageView.call(this);
         _createMenuView.call(this);
-        _createBackdrop.call(this);
+        //_createBackdrop.call(this);
 
         _setListeners.call(this);
         _handleSwipe.call(this);
@@ -99,10 +99,12 @@ define('AppView', [
     function _createMenuView(){
         this.menuView = new MenuView({ stripData: [{
             iconUrl: 'http://img3.wikia.nocookie.net/__cb20130623192636/deadoralive/images/archive/4/40/20140501111521!DOA5U_Rachel_Render.png',
-            title: 'Famo.us'        
+            title: 'Home',
+            page: 'HomePage'        
         }, {
             iconUrl: 'http://img3.wikia.nocookie.net/__cb20130623192636/deadoralive/images/archive/4/40/20140501111521!DOA5U_Rachel_Render.png',
-            title: 'Famo.us2'
+            title: 'Profile',
+            page: 'ProfilePage' 
         }]});
         var menuModifier = new StateModifier({
             transform: Transform.behind
@@ -111,7 +113,13 @@ define('AppView', [
     }
 
     function _setListeners() {
-        this.pageView.on('menuToggleLeft', this.menuToggleLeft.bind(this));
+        var self = this;
+        self.pageView.on('menuToggleLeft', self.menuToggleLeft.bind(self));
+        self.menuView.on('switchPage', function(page){
+            this._showPage(page);
+            console.log(page);
+            self.menuToggleLeft();
+        }.bind(self.pageView));
     }
     function _handleSwipe() {
         var sync = new GenericSync(
